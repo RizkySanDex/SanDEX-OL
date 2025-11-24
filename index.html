@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SanDEX-OL</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+    font-family:"Segoe UI",Arial,sans-serif;
+    background:#f7f7f7;
+    color:#222;
+}
+
+.container{width:94%;max-width:1150px;margin:20px auto}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:10px}
+.logo{display:flex;align-items:center;gap:8px}
+.logo i{font-size:1.6rem;color:#ff5314}
+.logo h1{font-size:1.1rem;font-weight:700}
+
+.header-ads {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    margin: 0 15px;
+}
+
+.ads-banner-728 {
+    width: 728px;
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ads-banner-320 {
+    width: 320px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-bar{flex:1;display:flex;max-width:520px;margin-left:12px;min-width:200px}
+.search-bar input{
+    flex:1;padding:9px 12px;border:1px solid #ddd;border-radius:6px 0 0 6px
+}
+.search-bar button{
+    background:#2a2a2a;color:white;padding:0 14px;border-radius:0 6px 6px 0;
+}
+
+.nav-links a{margin-left:12px;color:#777;text-decoration:none;font-size:.9rem}
+
+.filters-container {
+    position: relative;
+    margin: 14px 0;
+    overflow: hidden;
+}
+
+.filters-scroll {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+.filters-scroll::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+.filter-btn{
+    padding:8px 14px;
+    border:1px solid #eee;
+    border-radius:20px;
+    background:#fff;
+    cursor:pointer;
+    color:#666;
+    font-weight:400; /* Diubah dari 600 (bold) ke 400 (normal) */
+    font-size:0.82rem; /* Diubah dari 0.87rem ke 0.82rem */
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.filter-btn.active{
+    background:#ff5314;
+    color:#fff;
+    border-color:#ff5314
+}
+
+.video-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+    gap:18px;
+}
+
+.video-card{
+    background:white;
+    border-radius:12px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.06);
+    overflow:hidden;
+    transition:.2s;
+}
+.video-card:hover{transform:translateY(-6px)}
+
+.video-thumb{
+    position:relative;
+    width:100%;
+    aspect-ratio:1/1;
+    background:#f3f3f3;
+}
+.video-thumb img{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+.video-duration{
+    position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.6);
+    color:white;padding:3px 7px;font-size:12px;border-radius:6px
+}
+
+.video-info{padding:12px}
+.video-info h3{
+    height:32px;
+    font-size:0.78rem;
+    font-weight:400;
+    overflow:hidden;
+    margin-bottom:4px;
+    line-height:1.25;
+}
+.video-meta{
+    display:flex;justify-content:space-between;font-size:0.85rem;color:#777;
+    margin-bottom:10px
+}
+.video-actions{display:flex;gap:8px}
+.watch-btn,.buy-btn{
+    flex:1;
+    text-align:center;
+    padding:6px 0;
+    font-size:0.75rem;
+    border-radius:5px;
+    text-decoration:none;
+    font-weight:500;
+    color:white;
+}
+.watch-btn{background:#ff5314}
+.buy-btn{background:#2a2a2a}
+
+.modal{
+    position:fixed;inset:0;
+    background:rgba(0,0,0,.85);
+    display:none;align-items:center;justify-content:center;
+    padding:10px;z-index:1500;
+}
+.modal.open{display:flex}
+
+.modal-box{
+    background:white;width:100%;max-width:1180px;max-height:95vh;
+    border-radius:12px;overflow:hidden;
+    position:relative;box-shadow:0 20px 60px rgba(0,0,0,.35);
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-close{
+    position:absolute;top:16px;right:16px;
+    width:40px;height:40px;border-radius:50%;
+    background:rgba(0,0,0,.45);color:white;
+    font-size:20px;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;border:none;z-index:10;
+}
+
+.modal-content-row{
+    display:flex;
+    gap:6px;
+    padding:10px;
+    flex: 1;
+    overflow: auto;
+}
+.modal-left{flex:2}
+.modal-right{flex:1;display:grid;gap:6px}
+
+.modal-video-wrap{
+    position:relative;width:100%;aspect-ratio:16/9;background:black;
+}
+.modal-video-wrap iframe,
+.modal-video-wrap video{
+    position:absolute;inset:0;width:100%;height:100%;object-fit:contain;border:0;
+}
+
+/* POSTER GRID RAPAT 100% */
+.image-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,95px);
+    grid-auto-rows:95px;
+    gap:6px;
+    justify-content:start;
+}
+.image-grid img{
+    width:95px;height:95px;
+    object-fit:cover;
+    border-radius:8px;
+    cursor:pointer;
+    border:1px solid #eee;
+    background:#f3f3f3;
+}
+
+.modal-details{
+    padding:10px 16px 14px;
+    border-top:1px solid #eee;
+    margin-top:-4px;
+}
+.modal-details h3{font-size:1.1rem;margin-bottom:4px}
+.modal-details p{color:#555;font-size:0.9rem;margin-bottom:6px;line-height:1.32}
+.product-link{
+    display:inline-block;padding:10px 16px;background:#ff5314;
+    color:white;border-radius:8px;font-weight:700;text-decoration:none;margin-top:4px
+}
+
+.ads-banner-300 {
+    width: 300px;
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px auto;
+}
+
+.ads-banner-320 {
+    width: 320px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ads-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.video-ads-container {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.img-viewer{
+    position:fixed;inset:0;background:rgba(0,0,0,.85);
+    display:none;align-items:center;justify-content:center;
+    z-index:3000;
+}
+.img-viewer.open{display:flex}
+
+.img-viewer img{
+    max-width:90%;max-height:90%;border-radius:10px;object-fit:contain;
+}
+
+.img-viewer-btn{
+    position:absolute;top:50%;transform:translateY(-50%);
+    background:rgba(0,0,0,.6);color:white;
+    width:50px;height:50px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:28px;border:none;cursor:pointer;
+}
+.img-prev{left:20px}
+.img-next{right:20px}
+
+.img-viewer-close{
+    position:absolute;top:20px;right:20px;
+    width:45px;height:45px;border-radius:50%;
+    font-size:28px;background:rgba(0,0,0,.6);color:white;border:none;cursor:pointer
+}
+
+/* PAGINATION STYLES */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 30px 0;
+    gap: 8px;
+}
+
+.pagination-btn {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-weight: 500;
+    color: #333;
+    transition: all 0.2s;
+    min-width: 40px;
+    text-align: center;
+}
+
+.pagination-btn:hover {
+    background: #f5f5f5;
+}
+
+.pagination-btn.active {
+    background: #ff5314;
+    color: white;
+    border-color: #ff5314;
+}
+
+.pagination-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-btn.disabled:hover {
+    background: white;
+}
+
+.pagination-dots {
+    padding: 8px 6px;
+    color: #777;
+}
+
+.loading {
+    text-align: center;
+    padding: 20px;
+    color: #777;
+    font-size: 1rem;
+}
+
+/* MEDIA QUERIES UNTUK RESPONSIVITAS MOBILE */
+@media(max-width:768px){
+    .modal-content-row{flex-direction:column}
+    
+    /* Header mobile */
+    header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    
+    .header-ads {
+        margin: 0;
+        order: 3;
+    }
+    
+    .search-bar {
+        margin-left: 0;
+        max-width: 100%;
+    }
+    
+    .nav-links {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
+    
+    .nav-links a {
+        margin-left: 0;
+    }
+    
+    /* Video grid mobile */
+    .video-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 12px;
+    }
+    
+    /* Modal mobile */
+    .modal {
+        padding: 5px;
+    }
+    
+    .modal-box {
+        max-height: 98vh;
+    }
+    
+    .modal-content-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .modal-left, .modal-right {
+        flex: none;
+    }
+    
+    .image-grid {
+        grid-template-columns: repeat(auto-fill, 70px);
+        grid-auto-rows: 70px;
+        justify-content: center;
+    }
+    
+    .image-grid img {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .modal-details h3 {
+        font-size: 1rem;
+    }
+    
+    .modal-details p {
+        font-size: 0.85rem;
+    }
+    
+    /* Image viewer mobile */
+    .img-viewer-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+    
+    .img-prev {
+        left: 10px;
+    }
+    
+    .img-next {
+        right: 10px;
+    }
+    
+    .img-viewer-close {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+        top: 10px;
+        right: 10px;
+    }
+    
+    /* Pagination mobile */
+    .pagination-container {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    
+    .pagination-btn {
+        padding: 6px 10px;
+        min-width: 36px;
+        font-size: 0.9rem;
+    }
+}
+
+@media(max-width:480px){
+    .video-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .video-info h3 {
+        font-size: 0.75rem;
+        height: 36px;
+    }
+    
+    .video-actions {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .watch-btn, .buy-btn {
+        padding: 8px 0;
+        font-size: 0.8rem;
+    }
+    
+    .logo h1 {
+        font-size: 1rem;
+    }
+    
+    .search-bar input {
+        padding: 10px 12px;
+    }
+    
+    .filter-btn {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+    }
+    
+    .modal-details {
+        padding: 8px 12px 12px;
+    }
+    
+    /* Pagination small mobile */
+    .pagination-container {
+        gap: 4px;
+    }
+    
+    .pagination-btn {
+        padding: 6px 8px;
+        min-width: 32px;
+        font-size: 0.85rem;
+    }
+}
+
+/* Touch improvements */
+@media (hover: none) {
+    .video-card:hover {
+        transform: none;
+    }
+    
+    .filter-btn:hover {
+        background: #fff;
+        color: #666;
+    }
+    
+    .filter-btn.active:hover {
+        background: #ff5314;
+        color: #fff;
+    }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+    <header>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex:1;">
+            <div class="logo"><i class="fas fa-play-circle"></i><h1>SanDEX-OL</h1></div>
+            <div class="header-ads">
+                <!-- Iklan 320x50 di Header (ganti dari 728x90) -->
+                <div class="ads-banner-320">
+                    <script type="text/javascript">
+                        atOptions = {
+                            'key' : '4f9c346f70ab657b945671f6ef7fe74c',
+                            'format' : 'iframe',
+                            'height' : 50,
+                            'width' : 320,
+                            'params' : {}
+                        };
+                    </script>
+                    <script type="text/javascript" src="//www.highperformanceformat.com/4f9c346f70ab657b945671f6ef7fe74c/invoke.js"></script>
+                </div>
+            </div>
+            <div class="search-bar">
+                <input id="searchInput" type="text" placeholder="Cari video...">
+                <button><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+        <nav class="nav-links">
+            <a>Beranda</a>
+            <a>Kategori</a>
+        </nav>
+    </header>
+
+    <div class="filters-container">
+        <div class="filters-scroll">
+            <button class="filter-btn active">Semua</button>
+            <button class="filter-btn">Jam Tangan Pria</button>
+            <button class="filter-btn">Jam Tangan Wanita</button>
+            <button class="filter-btn">Jam Tangan Couple</button>
+            </div>
+    </div>
+
+    <div id="videoContainer" class="video-grid"></div>
+    
+    <!-- PAGINATION -->
+    <div class="pagination-container" id="paginationContainer"></div>
+</div>
+
+<!-- MODAL -->
+<div id="videoModal" class="modal">
+    <div class="modal-box" id="modalBox">
+        <button class="modal-close" id="closeModal">&times;</button>
+
+        <div class="modal-content-row">
+            <div class="modal-left">
+                <div class="modal-video-wrap" id="modalVideo"></div>
+                
+                <!-- Iklan 320x50 di bawah video -->
+                <div class="video-ads-container">
+                    <div class="ads-banner-320">
+                        <script type="text/javascript">
+                            atOptions = {
+                                'key' : '4f9c346f70ab657b945671f6ef7fe74c',
+                                'format' : 'iframe',
+                                'height' : 50,
+                                'width' : 320,
+                                'params' : {}
+                            };
+                        </script>
+                        <script type="text/javascript" src="//www.highperformanceformat.com/4f9c346f70ab657b945671f6ef7fe74c/invoke.js"></script>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-right">
+                <div class="ads-sidebar">
+                    <div class="image-grid" id="imageGallery"></div>
+                    <!-- Iklan 300x250 di bawah foto-foto produk -->
+                    <div class="ads-banner-300">
+                        <script type="text/javascript">
+                            atOptions = {
+                                'key' : 'ad84fafb170e5fcdcc5c91b6a8ed321c',
+                                'format' : 'iframe',
+                                'height' : 250,
+                                'width' : 300,
+                                'params' : {}
+                            };
+                        </script>
+                        <script type="text/javascript" src="//www.highperformanceformat.com/ad84fafb170e5fcdcc5c91b6a8ed321c/invoke.js"></script>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-details">
+            <h3 id="modalTitle"></h3>
+            <p id="modalDescription"></p>
+            <a id="modalProductLink" class="product-link" target="_blank">Lihat Produk</a>
+        </div>
+    </div>
+</div>
+
+<!-- IMAGE VIEWER -->
+<div class="img-viewer" id="imgViewer">
+    <button class="img-viewer-btn img-prev" id="imgPrev">&#10094;</button>
+    <img id="imgViewerImg" src="">
+    <button class="img-viewer-btn img-next" id="imgNext">&#10095;</button>
+    <button class="img-viewer-close" id="imgViewerClose">&times;</button>
+</div>
+
+<script>
+const BLOG_ID = "1270956603326785727";
+const API_KEY = "AIzaSyA8k0Fr9m-7zsC1EzdOjI3kgMR92bJHs_E";
+
+const videoContainer = document.getElementById("videoContainer");
+const paginationContainer = document.getElementById("paginationContainer");
+
+let currentVideos = [];
+let currentPage = 1;
+const videosPerPage = 18; // 18 video per halaman
+
+function parseHTML(post){
+    return new DOMParser().parseFromString(post.content || "", "text/html");
+}
+
+function extractThumbnail(p){
+    const doc = parseHTML(p);
+    return doc.querySelector(".thumbnail")?.textContent?.trim() ||
+           doc.querySelector("img")?.src ||
+           "https://via.placeholder.com/600x800?text=No+Image";
+}
+function extractVideoUrl(p){
+    const doc = parseHTML(p);
+    return doc.querySelector(".video_url")?.textContent?.trim() ||
+           doc.querySelector("iframe")?.src || "";
+}
+function extractDescription(p){
+    const doc = parseHTML(p);
+    return doc.querySelector(".video-description")?.textContent?.trim() || "";
+}
+function extractProductLink(p){
+    const doc = parseHTML(p);
+    return doc.querySelector(".product_link")?.textContent?.trim() ||
+           doc.querySelector("a[href*='shopee']")?.href || "#";
+}
+function extractGallery(p){
+    const doc = parseHTML(p);
+    const raw = doc.querySelector(".gallery")?.textContent?.trim();
+    if(!raw) return [];
+    return raw.split(",").map(x=>x.trim()).filter(x=>x.length>5);
+}
+
+// NEW: extractPrice function
+function extractPrice(p){
+    try{
+        const doc = parseHTML(p);
+        return doc.querySelector('.product_price')?.textContent?.trim() || "-";
+    }catch(e){
+        return "-";
+    }
+}
+
+// Fungsi untuk mengambil semua video dari Blogger API
+async function loadAllVideos() {
+    let allVideos = [];
+    let nextPageToken = null;
+    let page = 1;
+    
+    // Tampilkan loading
+    videoContainer.innerHTML = '<div class="loading">Memuat video...</div>';
+    
+    try {
+        // Loop untuk mengambil semua halaman
+        do {
+            let url = `https://www.googleapis.com/blogger/v3/blogs/${BLOG_ID}/posts?key=${API_KEY}&maxResults=500`;
+            
+            if (nextPageToken) {
+                url += `&pageToken=${nextPageToken}`;
+            }
+            
+            const res = await fetch(url);
+            const data = await res.json();
+            
+            if (data.items && data.items.length > 0) {
+                const pageVideos = data.items.map(p => ({
+                    id: p.id,
+                    title: p.title,
+                    thumbnail: extractThumbnail(p),
+                    videoUrl: extractVideoUrl(p),
+                    productLink: extractProductLink(p),
+                    description: extractDescription(p),
+                    gallery: extractGallery(p),
+                    price: extractPrice(p),
+                    labels: p.labels || []
+                }));
+                
+                allVideos = allVideos.concat(pageVideos);
+                console.log(`Halaman ${page}: ${pageVideos.length} video`);
+            }
+            
+            nextPageToken = data.nextPageToken || null;
+            page++;
+            
+        } while (nextPageToken);
+        
+        console.log(`Total video yang diambil: ${allVideos.length}`);
+        return allVideos;
+        
+    } catch (error) {
+        console.error('Error mengambil video:', error);
+        videoContainer.innerHTML = '<div class="loading">Error memuat video. Silakan refresh halaman.</div>';
+        return [];
+    }
+}
+
+async function loadVideos(){
+    currentVideos = await loadAllVideos();
+    
+    if (currentVideos.length > 0) {
+        renderList(currentVideos);
+        renderPagination(currentVideos.length);
+        initFilters();
+    }
+}
+
+function renderList(list){
+    // Hitung video yang akan ditampilkan di halaman saat ini
+    const startIndex = (currentPage - 1) * videosPerPage;
+    const endIndex = startIndex + videosPerPage;
+    const videosToShow = list.slice(startIndex, endIndex);
+    
+    videoContainer.innerHTML = "";
+    
+    if (videosToShow.length === 0) {
+        videoContainer.innerHTML = '<div class="loading">Tidak ada video yang ditemukan.</div>';
+        return;
+    }
+    
+    videosToShow.forEach(v=>{
+        const card = document.createElement("div");
+        card.className = "video-card";
+        card.innerHTML = `
+            <div class="video-thumb">
+                <img src="${v.thumbnail}" alt="${v.title}" loading="lazy">
+                <div class="video-duration"></div>
+            </div>
+            <div class="video-info">
+                <h3>${v.title}</h3>
+                <div class="video-meta"><span>${v.price || 'Harga'}</span></div>
+                <div class="video-actions">
+                    <a href="#" class="watch-btn" data-id="${v.id}">Lihat Produk</a>
+                    <a class="buy-btn" href="${v.productLink}" target="_blank">Beli</a>
+                </div>
+            </div>`;
+
+        card.querySelector(".watch-btn").onclick = e=>{
+            e.preventDefault();
+            openModal(v.id);
+        };
+        videoContainer.appendChild(card);
+    });
+}
+
+function renderPagination(totalVideos) {
+    const totalPages = Math.ceil(totalVideos / videosPerPage);
+    paginationContainer.innerHTML = "";
+    
+    if (totalPages <= 1) return;
+    
+    // Tombol Previous
+    const prevBtn = document.createElement("button");
+    prevBtn.className = `pagination-btn ${currentPage === 1 ? 'disabled' : ''}`;
+    prevBtn.innerHTML = "&lt;";
+    prevBtn.onclick = () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderList(currentVideos);
+            renderPagination(totalVideos);
+            window.scrollTo(0, 0);
+        }
+    };
+    paginationContainer.appendChild(prevBtn);
+    
+    // Tampilkan nomor halaman
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    // Sesuaikan jika kita di dekat akhir
+    if (endPage - startPage + 1 < maxVisiblePages) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    // Tombol halaman pertama jika perlu
+    if (startPage > 1) {
+        const firstPageBtn = document.createElement("button");
+        firstPageBtn.className = "pagination-btn";
+        firstPageBtn.textContent = "1";
+        firstPageBtn.onclick = () => {
+            currentPage = 1;
+            renderList(currentVideos);
+            renderPagination(totalVideos);
+            window.scrollTo(0, 0);
+        };
+        paginationContainer.appendChild(firstPageBtn);
+        
+        // Tanda elipsis jika perlu
+        if (startPage > 2) {
+            const dots = document.createElement("span");
+            dots.className = "pagination-dots";
+            dots.textContent = "...";
+            paginationContainer.appendChild(dots);
+        }
+    }
+    
+    // Tampilkan nomor halaman
+    for (let i = startPage; i <= endPage; i++) {
+        const pageBtn = document.createElement("button");
+        pageBtn.className = `pagination-btn ${i === currentPage ? 'active' : ''}`;
+        pageBtn.textContent = i;
+        pageBtn.onclick = () => {
+            currentPage = i;
+            renderList(currentVideos);
+            renderPagination(totalVideos);
+            window.scrollTo(0, 0);
+        };
+        paginationContainer.appendChild(pageBtn);
+    }
+    
+    // Tombol halaman terakhir jika perlu
+    if (endPage < totalPages) {
+        // Tanda elipsis jika perlu
+        if (endPage < totalPages - 1) {
+            const dots = document.createElement("span");
+            dots.className = "pagination-dots";
+            dots.textContent = "...";
+            paginationContainer.appendChild(dots);
+        }
+        
+        const lastPageBtn = document.createElement("button");
+        lastPageBtn.className = "pagination-btn";
+        lastPageBtn.textContent = totalPages;
+        lastPageBtn.onclick = () => {
+            currentPage = totalPages;
+            renderList(currentVideos);
+            renderPagination(totalVideos);
+            window.scrollTo(0, 0);
+        };
+        paginationContainer.appendChild(lastPageBtn);
+    }
+    
+    // Tombol Next
+    const nextBtn = document.createElement("button");
+    nextBtn.className = `pagination-btn ${currentPage === totalPages ? 'disabled' : ''}`;
+    nextBtn.innerHTML = "&gt;";
+    nextBtn.onclick = () => {
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderList(currentVideos);
+            renderPagination(totalVideos);
+            window.scrollTo(0, 0);
+        }
+    };
+    paginationContainer.appendChild(nextBtn);
+}
+
+function openModal(id){
+    const v = currentVideos.find(x=>x.id===id);
+    if(!v) return;
+
+    document.getElementById("modalTitle").textContent = v.title;
+    document.getElementById("modalDescription").textContent = v.description;
+    document.getElementById("modalProductLink").href = v.productLink;
+    document.getElementById("modalVideo").innerHTML = `<iframe src="${v.videoUrl}?autoplay=1" allowfullscreen></iframe>`;
+
+    const grid = document.getElementById("imageGallery");
+    grid.innerHTML = "";
+    v.gallery.forEach((src,i)=>{
+        const img = document.createElement("img");
+        img.src = src;
+        img.alt = `Gambar produk ${i+1}`;
+        img.onclick = ()=>openImageViewer(i,v.gallery);
+        grid.appendChild(img);
+    });
+
+    document.getElementById("videoModal").classList.add("open");
+}
+
+document.getElementById("closeModal").onclick = ()=>{
+    document.getElementById("videoModal").classList.remove("open");
+    document.getElementById("modalVideo").innerHTML="";
+};
+
+let currentGallery=[];
+let currentIndex=0;
+
+function openImageViewer(i,gallery){
+    currentGallery = gallery;
+    currentIndex = i;
+    document.getElementById("imgViewerImg").src = gallery[i];
+    document.getElementById("imgViewer").classList.add("open");
+}
+
+document.getElementById("imgPrev").onclick = ()=>{
+    if(!currentGallery.length) return;
+    currentIndex = (currentIndex - 1 + currentGallery.length) % currentGallery.length;
+    document.getElementById("imgViewerImg").src = currentGallery[currentIndex];
+};
+
+document.getElementById("imgNext").onclick = ()=>{
+    if(!currentGallery.length) return;
+    currentIndex = (currentIndex + 1) % currentGallery.length;
+    document.getElementById("imgViewerImg").src = currentGallery[currentIndex];
+};
+
+document.getElementById("imgViewerClose").onclick = ()=>{
+    document.getElementById("imgViewer").classList.remove("open");
+};
+
+loadVideos();
+
+function initFilters(){
+    document.querySelectorAll('.filter-btn').forEach(btn=>{
+        btn.onclick = ()=>{
+            document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const label = btn.textContent.trim().toLowerCase();
+
+            if(label === "semua"){
+                currentPage = 1;
+                renderList(currentVideos);
+                renderPagination(currentVideos.length);
+            } else {
+                const filtered = currentVideos.filter(v =>
+                    (v.labels || []).map(x=>x.toLowerCase()).includes(label)
+                );
+                currentPage = 1;
+                renderList(filtered);
+                renderPagination(filtered.length);
+            }
+        };
+    });
+}
+
+// Search functionality
+document.querySelector('.search-bar button').addEventListener('click', performSearch);
+document.getElementById('searchInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        performSearch();
+    }
+});
+
+function performSearch() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+    
+    if (searchTerm === '') {
+        currentPage = 1;
+        renderList(currentVideos);
+        renderPagination(currentVideos.length);
+        return;
+    }
+    
+    const filtered = currentVideos.filter(v => 
+        v.title.toLowerCase().includes(searchTerm) || 
+        v.description.toLowerCase().includes(searchTerm)
+    );
+    
+    currentPage = 1;
+    renderList(filtered);
+    renderPagination(filtered.length);
+}
+</script>
+</body>
+</html>
